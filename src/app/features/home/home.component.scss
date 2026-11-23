@@ -286,78 +286,25 @@
 }
 
 // ============================================================
-// INFINITY SECTION - BONUS HIGHLIGHT
+// INFINITY BUTTON - Now part of regular button group
 // ============================================================
 
-.infinity-section {
-  margin: 12px 0;
-  padding: 24px;
-  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
-  border: 2px solid #ffc107;
-  box-shadow: 0 0 24px rgba(255, 193, 7, 0.4);
-  animation: infinity-glow 2s ease-in-out infinite;
-}
-
-@keyframes infinity-glow {
-  0%, 100% {
-    box-shadow: 0 0 24px rgba(255, 193, 7, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 32px rgba(255, 193, 7, 0.6);
-  }
-}
-
 .btn-infinity {
-  width: 100%;
-  min-height: 140px;
-  padding: 24px;
   background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
   color: #1a1a1a;
-  border: 3px solid #fff;
+  border: 2px solid #fff;
   font-weight: 800;
-  box-shadow: 0 8px 24px rgba(255, 193, 7, 0.4);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    animation: shimmer 2s infinite;
-  }
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
 
   &:hover:not(:disabled) {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(255, 193, 7, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.5);
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
   }
 
   &:active:not(:disabled) {
-    transform: translateY(-2px);
-  }
-
-  .btn-icon-large {
-    font-size: 56px;
-    line-height: 1;
-    display: block;
-  }
-
-  .btn-label-large {
-    font-size: 16px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.4);
   }
 }
 
@@ -475,18 +422,6 @@
     min-height: 70px;
     font-size: 16px;
   }
-
-  .btn-infinity {
-    min-height: 110px;
-
-    .btn-icon-large {
-      font-size: 48px;
-    }
-
-    .btn-label-large {
-      font-size: 14px;
-    }
-  }
 }
 
 @media (max-width: 480px) {
@@ -494,19 +429,6 @@
     padding: 14px 10px;
     min-height: 90px;
     min-width: 90px;
-  }
-
-  .btn-infinity {
-    min-height: 120px;
-
-    .btn-icon-large {
-      font-size: 48px;
-    }
-
-    .btn-label-large {
-      font-size: 14px;
-      letter-spacing: 1px;
-    }
   }
 }
 

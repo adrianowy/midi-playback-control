@@ -39,16 +39,6 @@
             <span class="btn-label">Stop</span>
           </button>
         </div>
-        <div class="button-group">
-          <button class="control-btn btn-secondary" (click)="onPreviousClick()">
-            <span class="btn-icon">⏮️</span>
-            <span class="btn-label">Previous</span>
-          </button>
-          <button class="control-btn btn-secondary" (click)="onNextClick()">
-            <span class="btn-icon">⏭️</span>
-            <span class="btn-label">Next</span>
-          </button>
-        </div>
       </div>
 
       <!-- Section 2: Loops e Repetição -->
@@ -63,15 +53,11 @@
             <span class="btn-icon">🔁</span>
             <span class="btn-label">Repeat</span>
           </button>
+          <button class="control-btn btn-info" (click)="onInfinityLoopClick()">
+            <span class="btn-icon">∞</span>
+            <span class="btn-label">Loop Infinito</span>
+          </button>
         </div>
-      </div>
-
-      <!-- Section 3: BONUS - Infinity Loop (Destaque) -->
-      <div class="grid-section infinity-section">
-        <button class="control-btn btn-infinity" (click)="onInfinityLoopClick()">
-          <span class="btn-icon-large">∞</span>
-          <span class="btn-label-large">Loop Infinito</span>
-        </button>
       </div>
 
       <!-- Section 4: Pads -->
