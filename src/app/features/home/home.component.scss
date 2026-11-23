@@ -1,5 +1,5 @@
 // ============================================================
-// HOME COMPONENT - Bootstrap 5 Styling
+// HOME COMPONENT - Bootstrap-like styling (custom implementation)
 // ============================================================
 
 :host {
@@ -24,6 +24,7 @@ ion-content {
   user-select: none;
   -webkit-user-select: none;
   transition: all 0.2s ease;
+  min-height: 100px;
 
   &:active {
     transform: scale(0.95);
