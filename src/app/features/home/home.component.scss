@@ -1,69 +1,69 @@
 // ============================================================
-// STAGE DESIGN - High Contrast, Large Touch Targets
+// HOME COMPONENT - Bootstrap 5 Styling
 // ============================================================
 
 :host {
-  --ion-background-color: #0a0e27;
-  --ion-text-color: #ffffff;
+  display: block;
+  height: 100%;
 }
 
-.app-header {
-  ion-toolbar {
-    --background: #1a1f3a;
-    --color: #fff;
-    padding: 12px 0;
+ion-content {
+  --background: #0a0e27;
+}
 
-    ion-title {
-      font-size: 24px;
-      font-weight: 600;
-      text-align: center;
-    }
+.card {
+  border: none;
+  border-radius: 8px;
+}
+
+.btn {
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  small {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    margin-top: 4px;
   }
 }
 
-.app-content {
-  --background: #0a0e27;
-  overflow-y: auto;
+// Responsive grid for pads - 3 cols on mobile, more on larger screens
+.col-md-1-5 {
+  @media (min-width: 768px) {
+    flex: 0 0 calc(16.66667% - 8px);
+    max-width: calc(16.66667% - 8px);
+  }
+
+  @media (min-width: 992px) {
+    flex: 0 0 calc(12.5% - 7px);
+    max-width: calc(12.5% - 7px);
+  }
 }
 
-.stage-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 16px;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
-}
-
-// ============================================================
-// CONNECTION STATUS
-// ============================================================
-
-.connection-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: rgba(76, 175, 80, 0.15);
-  border: 2px solid #4caf50;
+// Alert styling
+.alert {
   border-radius: 8px;
-  color: #4caf50;
-  font-weight: 600;
-  font-size: 14px;
-  text-align: center;
-  justify-content: center;
+  border: none;
+}
 
-  .status-dot {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
+.badge {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  animation: pulse 1.5s infinite;
 
-    &.connected {
-      background: #4caf50;
-      box-shadow: 0 0 10px rgba(76, 175, 80, 0.8);
-    }
+  &.bg-success {
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.8);
   }
 }
 
@@ -76,359 +76,8 @@
   }
 }
 
-// ============================================================
-// TRACK INFO
-// ============================================================
-
-.track-info {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border-left: 4px solid #2196f3;
-  border-radius: 8px;
-  text-align: center;
-
-  .track-name {
-    font-size: 20px;
-    font-weight: 700;
-    color: #fff;
-  }
-
-  .track-time {
-    font-size: 14px;
-    color: #b0bec5;
-  }
-
-  .track-section {
-    font-size: 14px;
-    color: #81c784;
-    font-weight: 600;
-  }
+// Dark theme for body/text
+ion-toolbar {
+  --background: #1a1f3a;
+  --color: #ffffff;
 }
-
-// ============================================================
-// CONTROLS GRID
-// ============================================================
-
-.controls-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding-bottom: 20px;
-}
-
-.grid-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-
-  .section-title {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #90caf9;
-  }
-
-  .button-group {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 8px;
-  }
-}
-
-// ============================================================
-// BUTTON STYLES
-// ============================================================
-
-.control-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 16px 12px;
-  min-height: 100px;
-  min-width: 100px;
-  border: 2px solid transparent;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.2s ease;
-  touch-action: manipulation;
-  user-select: none;
-  -webkit-user-select: none;
-
-  &:active {
-    transform: scale(0.95);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .btn-icon {
-    font-size: 36px;
-    line-height: 1;
-  }
-
-  .btn-label {
-    text-align: center;
-    line-height: 1.2;
-  }
-}
-
-// Primary Buttons - Play/Pause
-.btn-primary {
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-  color: #fff;
-  border-color: #229954;
-  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(46, 204, 113, 0.5);
-    background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(46, 204, 113, 0.4);
-  }
-}
-
-// Danger Buttons - Stop
-.btn-danger {
-  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-  color: #fff;
-  border-color: #a93226;
-  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(231, 76, 60, 0.5);
-    background: linear-gradient(135deg, #c0392b 0%, #922b21 100%);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
-  }
-}
-
-// Secondary Buttons - Next/Previous
-.btn-secondary {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-  color: #fff;
-  border-color: #2471a3;
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(52, 152, 219, 0.5);
-    background: linear-gradient(135deg, #2980b9 0%, #1f618d 100%);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
-  }
-}
-
-// Info Buttons - Loops
-.btn-info {
-  background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
-  color: #fff;
-  border-color: #6a1b9a;
-  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(156, 39, 176, 0.5);
-    background: linear-gradient(135deg, #7b1fa2 0%, #5e35b1 100%);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(156, 39, 176, 0.4);
-  }
-}
-
-// Warning Buttons - Audio
-.btn-warning {
-  background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
-  color: #fff;
-  border-color: #ba4a00;
-  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(243, 156, 18, 0.5);
-    background: linear-gradient(135deg, #d68910 0%, #b56e0d 100%);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(243, 156, 18, 0.4);
-  }
-}
-
-// ============================================================
-// INFINITY BUTTON - Now part of regular button group
-// ============================================================
-
-.btn-infinity {
-  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-  color: #1a1a1a;
-  border: 2px solid #fff;
-  font-weight: 800;
-  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.5);
-    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-  }
-
-  &:active:not(:disabled) {
-    transform: scale(0.95);
-    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.4);
-  }
-}
-
-// ============================================================
-// PADS SECTION
-// ============================================================
-
-.pads-section {
-  .pads-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-}
-
-.pad-btn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 1;
-  min-height: 90px;
-  padding: 12px;
-  background: linear-gradient(135deg, #546e7a 0%, #37474f 100%);
-  color: #eceff1;
-  border: 2px solid #90a4ae;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  touch-action: manipulation;
-  user-select: none;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-  }
-
-  &:active:not(:disabled) {
-    transform: scale(0.95);
-  }
-
-  &.pad-active {
-    background: linear-gradient(135deg, #00c853 0%, #00a040 100%);
-    color: #fff;
-    border-color: #69f0ae;
-    box-shadow: 0 0 16px rgba(0, 200, 83, 0.6);
-
-    .pad-number::after {
-      content: ' ✓';
-      animation: check-pop 0.4s ease;
-    }
-  }
-
-  .pad-number {
-    display: block;
-  }
-}
-
-@keyframes check-pop {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-// ============================================================
-// RESPONSIVE DESIGN
-// ============================================================
-
-@media (orientation: landscape) {
-  .stage-container {
-    padding: 12px;
-    gap: 16px;
-  }
-
-  .track-info {
-    padding: 12px;
-  }
-
-  .grid-section {
-    padding: 12px;
-
-    .button-group {
-      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-      gap: 6px;
-    }
-  }
-
-  .control-btn {
-    padding: 12px 8px;
-    min-height: 90px;
-    min-width: 90px;
-    font-size: 11px;
-
-    .btn-icon {
-      font-size: 32px;
-    }
-  }
-
-  .pads-section .pads-grid {
-    grid-template-columns: repeat(8, 1fr);
-    gap: 8px;
-  }
-
-  .pad-btn {
-    min-height: 70px;
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 480px) {
-  .control-btn {
-    padding: 14px 10px;
-    min-height: 90px;
-    min-width: 90px;
-  }
-}
-

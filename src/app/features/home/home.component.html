@@ -1,90 +1,145 @@
-<ion-header [translucent]="true" class="app-header">
+<ion-header [translucent]="true" class="bg-dark border-bottom border-secondary">
   <ion-toolbar>
-    <ion-title>🎵 MIDI Playback Control</ion-title>
+    <ion-title class="text-white">🎵 MIDI Playback Control</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="app-content">
-  <div class="stage-container">
+<ion-content [fullscreen]="true" class="bg-dark">
+  <div class="container-fluid py-4">
     <!-- Connection Status -->
-    <div class="connection-status">
-      <span class="status-dot connected"></span>
+    <div class="alert alert-success d-flex align-items-center gap-2 mb-3">
+      <span class="badge bg-success rounded-pill"></span>
       <span>Connected to iPad • 192.168.1.100:5004</span>
     </div>
 
     <!-- Current Track Info -->
-    <div class="track-info">
-      <div class="track-name">🎵 Amazing Grace</div>
-      <div class="track-time">02:34 / 05:00</div>
-      <div class="track-section">📍 Verso</div>
+    <div class="card bg-secondary text-white mb-4">
+      <div class="card-body text-center">
+        <h5 class="card-title mb-2">🎵 Amazing Grace</h5>
+        <p class="card-text mb-1">02:34 / 05:00</p>
+        <p class="card-text small text-success">📍 Verso</p>
+      </div>
     </div>
 
     <!-- Main Grid -->
-    <div class="controls-grid">
+    <div class="row g-3">
 
       <!-- Section 1: Reprodução Básica -->
-      <div class="grid-section playback-section">
-        <h3 class="section-title">Reprodução</h3>
-        <div class="button-group">
-          <button class="control-btn btn-primary" (click)="onPlayClick()">
-            <span class="btn-icon">▶️</span>
-            <span class="btn-label">Play</span>
-          </button>
-          <button class="control-btn btn-primary" (click)="onPauseClick()">
-            <span class="btn-icon">⏸️</span>
-            <span class="btn-label">Pause</span>
-          </button>
-          <button class="control-btn btn-danger" (click)="onStopClick()">
-            <span class="btn-icon">⏹️</span>
-            <span class="btn-label">Stop</span>
-          </button>
+      <div class="col-12">
+        <div class="card bg-secondary">
+          <div class="card-body">
+            <h6 class="card-title text-uppercase text-info mb-3">Reprodução</h6>
+            <div class="row g-2">
+              <div class="col-4 col-md-2">
+                <button class="btn btn-success btn-lg w-100" (click)="onPlayClick()" style="min-height: 100px;">
+                  <div class="text-center">
+                    <div style="font-size: 36px;">▶️</div>
+                    <small>Play</small>
+                  </div>
+                </button>
+              </div>
+              <div class="col-4 col-md-2">
+                <button class="btn btn-success btn-lg w-100" (click)="onPauseClick()" style="min-height: 100px;">
+                  <div class="text-center">
+                    <div style="font-size: 36px;">⏸️</div>
+                    <small>Pause</small>
+                  </div>
+                </button>
+              </div>
+              <div class="col-4 col-md-2">
+                <button class="btn btn-danger btn-lg w-100" (click)="onStopClick()" style="min-height: 100px;">
+                  <div class="text-center">
+                    <div style="font-size: 36px;">⏹️</div>
+                    <small>Stop</small>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Section 2: Loops e Repetição -->
-      <div class="grid-section loop-section">
-        <h3 class="section-title">Loops</h3>
-        <div class="button-group">
-          <button class="control-btn btn-info" (click)="onLoopSectionClick()">
-            <span class="btn-icon">📍</span>
-            <span class="btn-label">Loop Section</span>
-          </button>
-          <button class="control-btn btn-info" (click)="onRepeatClick()">
-            <span class="btn-icon">🔁</span>
-            <span class="btn-label">Repeat</span>
-          </button>
-          <button class="control-btn btn-info" (click)="onInfinityLoopClick()">
-            <span class="btn-icon">∞</span>
-            <span class="btn-label">Loop Infinito</span>
-          </button>
+      <div class="col-12">
+        <div class="card bg-secondary">
+          <div class="card-body">
+            <h6 class="card-title text-uppercase text-info mb-3">Loops</h6>
+            <div class="row g-2">
+              <div class="col-4 col-md-2">
+                <button class="btn btn-primary btn-lg w-100" (click)="onLoopSectionClick()" style="min-height: 100px;">
+                  <div class="text-center">
+                    <div style="font-size: 36px;">📍</div>
+                    <small>Loop Section</small>
+                  </div>
+                </button>
+              </div>
+              <div class="col-4 col-md-2">
+                <button class="btn btn-primary btn-lg w-100" (click)="onRepeatClick()" style="min-height: 100px;">
+                  <div class="text-center">
+                    <div style="font-size: 36px;">🔁</div>
+                    <small>Repeat</small>
+                  </div>
+                </button>
+              </div>
+              <div class="col-4 col-md-2">
+                <button class="btn btn-warning btn-lg w-100 text-dark" (click)="onInfinityLoopClick()" style="min-height: 100px;">
+                  <div class="text-center">
+                    <div style="font-size: 36px;">∞</div>
+                    <small>Loop Infinito</small>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Section 4: Pads -->
-      <div class="grid-section pads-section">
-        <h3 class="section-title">Pads</h3>
-        <div class="pads-grid">
-          <button *ngFor="let pad of pads; let i = index" 
-                  class="pad-btn" 
-                  [class.pad-active]="pad.active"
-                  (click)="onPadClick(i)">
-            <span class="pad-number">{{ i + 1 }}</span>
-          </button>
+      <!-- Section 3: Pads -->
+      <div class="col-12">
+        <div class="card bg-secondary">
+          <div class="card-body">
+            <h6 class="card-title text-uppercase text-info mb-3">Pads</h6>
+            <div class="row g-2">
+              <div class="col-3 col-sm-2 col-md-1-5" *ngFor="let pad of pads; let i = index">
+                <button class="btn w-100" 
+                        [ngClass]="pad.active ? 'btn-success' : 'btn-secondary'"
+                        (click)="onPadClick(i)"
+                        style="min-height: 90px; aspect-ratio: 1;">
+                  <div class="text-center">
+                    <div style="font-size: 20px; font-weight: bold;">{{ i + 1 }}</div>
+                    <small *ngIf="pad.active">✓</small>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Section 5: Volume e Áudio -->
-      <div class="grid-section audio-section">
-        <h3 class="section-title">Áudio</h3>
-        <div class="button-group">
-          <button class="control-btn btn-warning" (click)="onFadeInClick()">
-            <span class="btn-icon">🔊</span>
-            <span class="btn-label">Fade In</span>
-          </button>
-          <button class="control-btn btn-warning" (click)="onFadeOutClick()">
-            <span class="btn-icon">🔇</span>
-            <span class="btn-label">Fade Out</span>
-          </button>
+      <!-- Section 4: Volume e Áudio -->
+      <div class="col-12">
+        <div class="card bg-secondary">
+          <div class="card-body">
+            <h6 class="card-title text-uppercase text-info mb-3">Áudio</h6>
+            <div class="row g-2">
+              <div class="col-6 col-md-2">
+                <button class="btn btn-warning btn-lg w-100 text-dark" (click)="onFadeInClick()" style="min-height: 100px;">
+                  <div class="text-center">
+                    <div style="font-size: 36px;">🔊</div>
+                    <small>Fade In</small>
+                  </div>
+                </button>
+              </div>
+              <div class="col-6 col-md-2">
+                <button class="btn btn-warning btn-lg w-100 text-dark" (click)="onFadeOutClick()" style="min-height: 100px;">
+                  <div class="text-center">
+                    <div style="font-size: 36px;">🔇</div>
+                    <small>Fade Out</small>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
