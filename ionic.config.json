@@ -1,0 +1,17 @@
+{
+  "name": "MIDI Playback Control",
+  "integrations": {
+    "capacitor": {}
+  },
+  "projects": {
+    "app": {
+      "name": "MIDI Playback Control",
+      "integrations": {
+        "capacitor": {}
+      },
+      "type": "angular",
+      "root": "."
+    }
+  },
+  "type": "angular"
+}

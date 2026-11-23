@@ -1,0 +1,37 @@
+/**
+ * Network and AppleMIDI Protocol Constants
+ */
+
+export const NETWORK = {
+  // AppleMIDI Magic and Command bytes
+  APPLEMIDI_SIGNATURE: 0xffff,
+  APPLEMIDI_INVITATION: 0x494e, // 'IN'
+  APPLEMIDI_ACCEPTANCE: 0x4f4b, // 'OK'
+  APPLEMIDI_CLOCK_SYNC: 0x434b, // 'CK'
+  APPLEMIDI_BYE: 0x4259, // 'BY'
+  APPLEMIDI_PROTOCOL_VERSION: 0x00000002,
+
+  // Handshake & Connection
+  HANDSHAKE_TIMEOUT_MS: 5000,
+  HANDSHAKE_MAX_RETRIES: 3,
+  KEEP_ALIVE_INTERVAL_MS: 2000,
+
+  // Reconnection Strategy
+  RECONNECT_MAX_ATTEMPTS: 5,
+  RECONNECT_DELAY_MS: 3000,
+  RECONNECT_BACKOFF_MULTIPLIER: 1.5,
+
+  // RTP Header
+  RTP_PAYLOAD_TYPE_MIDI: 0x61, // 97
+  RTP_VERSION: 2,
+  RTP_CLOCK_RATE_HZ: 90000,
+  RTP_HEADER_SIZE: 12,
+  RTP_MIDI_COMMAND_HEADER: 1,
+
+  // Packet size limits
+  MAX_PACKET_SIZE: 1024,
+  MIN_INVITATION_PACKET_SIZE: 20,
+
+  // Session defaults
+  DEFAULT_SESSION_NAME: 'MIDI Control',
+} as const;
