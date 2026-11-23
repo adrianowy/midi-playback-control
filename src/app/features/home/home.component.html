@@ -1,22 +1,108 @@
-<ion-header>
+<ion-header [translucent]="true" class="app-header">
   <ion-toolbar>
-    <ion-title>MIDI Playback Control</ion-title>
+    <ion-title>🎵 MIDI Playback Control</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Welcome to Phase 1</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p>Remote control application for MultiTracks Playback on iPad</p>
-      <p><strong>Status:</strong> Phase 1 Foundation Complete ✅</p>
-      <p><strong>Next:</strong> Phase 2 (RTP-MIDI Implementation)</p>
-    </ion-card-content>
-  </ion-card>
+<ion-content [fullscreen]="true" class="app-content">
+  <div class="stage-container">
+    <!-- Connection Status -->
+    <div class="connection-status">
+      <span class="status-dot connected"></span>
+      <span>Connected to iPad • 192.168.1.100:5004</span>
+    </div>
 
-  <ion-button expand="full" color="primary">
-    Connect to iPad
-  </ion-button>
+    <!-- Current Track Info -->
+    <div class="track-info">
+      <div class="track-name">🎵 Amazing Grace</div>
+      <div class="track-time">02:34 / 05:00</div>
+      <div class="track-section">📍 Verso</div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="controls-grid">
+
+      <!-- Section 1: Reprodução Básica -->
+      <div class="grid-section playback-section">
+        <h3 class="section-title">Reprodução</h3>
+        <div class="button-group">
+          <button class="control-btn btn-primary" (click)="onPlayClick()">
+            <span class="btn-icon">▶️</span>
+            <span class="btn-label">Play</span>
+          </button>
+          <button class="control-btn btn-primary" (click)="onPauseClick()">
+            <span class="btn-icon">⏸️</span>
+            <span class="btn-label">Pause</span>
+          </button>
+          <button class="control-btn btn-danger" (click)="onStopClick()">
+            <span class="btn-icon">⏹️</span>
+            <span class="btn-label">Stop</span>
+          </button>
+        </div>
+        <div class="button-group">
+          <button class="control-btn btn-secondary" (click)="onPreviousClick()">
+            <span class="btn-icon">⏮️</span>
+            <span class="btn-label">Previous</span>
+          </button>
+          <button class="control-btn btn-secondary" (click)="onNextClick()">
+            <span class="btn-icon">⏭️</span>
+            <span class="btn-label">Next</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 2: Loops e Repetição -->
+      <div class="grid-section loop-section">
+        <h3 class="section-title">Loops</h3>
+        <div class="button-group">
+          <button class="control-btn btn-info" (click)="onLoopSectionClick()">
+            <span class="btn-icon">📍</span>
+            <span class="btn-label">Loop Section</span>
+          </button>
+          <button class="control-btn btn-info" (click)="onRepeatClick()">
+            <span class="btn-icon">🔁</span>
+            <span class="btn-label">Repeat</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 3: BONUS - Infinity Loop (Destaque) -->
+      <div class="grid-section infinity-section">
+        <button class="control-btn btn-infinity" (click)="onInfinityLoopClick()">
+          <span class="btn-icon-large">∞</span>
+          <span class="btn-label-large">Loop Infinito</span>
+        </button>
+      </div>
+
+      <!-- Section 4: Pads -->
+      <div class="grid-section pads-section">
+        <h3 class="section-title">Pads</h3>
+        <div class="pads-grid">
+          <button *ngFor="let pad of pads; let i = index" 
+                  class="pad-btn" 
+                  [class.pad-active]="pad.active"
+                  (click)="onPadClick(i)">
+            <span class="pad-number">{{ i + 1 }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 5: Volume e Áudio -->
+      <div class="grid-section audio-section">
+        <h3 class="section-title">Áudio</h3>
+        <div class="button-group">
+          <button class="control-btn btn-warning" (click)="onFadeInClick()">
+            <span class="btn-icon">🔊</span>
+            <span class="btn-label">Fade In</span>
+          </button>
+          <button class="control-btn btn-warning" (click)="onFadeOutClick()">
+            <span class="btn-icon">🔇</span>
+            <span class="btn-label">Fade Out</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
 </ion-content>

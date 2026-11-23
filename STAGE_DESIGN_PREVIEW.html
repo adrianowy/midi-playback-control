@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 MIDI Playback Control - Stage Design Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0e27;
+            --bg-light: #1a1f3a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0bec5;
+            --green: #2ecc71;
+            --green-dark: #27ae60;
+            --red: #e74c3c;
+            --blue: #3498db;
+            --blue-dark: #2980b9;
+            --purple: #9c27b0;
+            --purple-dark: #7b1fa2;
+            --orange: #f39c12;
+            --yellow: #ffc107;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-light) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .header {
+            background: var(--bg-light);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: rgba(76, 175, 80, 0.15);
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #4caf50;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4caf50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.8);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .track-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--blue);
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .track-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .track-time {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .track-section {
+            font-size: 14px;
+            color: #81c784;
+            font-weight: 600;
+        }
+
+        .grid-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .section {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #90caf9;
+            margin-bottom: 15px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .button-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 12px;
+            min-height: 100px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-icon {
+            font-size: 36px;
+            line-height: 1;
+        }
+
+        .btn-label {
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* Button Colors */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+            color: white;
+            border-color: #229954;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.5);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--red) 0%, #c0392b 100%);
+            color: white;
+            border-color: #a93226;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(231, 76, 60, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+            color: white;
+            border-color: #2471a3;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.5);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
+            color: white;
+            border-color: #6a1b9a;
+            box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+        }
+
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(156, 39, 176, 0.5);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--orange) 0%, #d68910 100%);
+            color: white;
+            border-color: #ba4a00;
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(243, 156, 18, 0.5);
+        }
+
+        /* Infinity Section */
+        .infinity-section {
+            margin: 12px 0;
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
+            border: 2px solid var(--yellow);
+            box-shadow: 0 0 24px rgba(255, 193, 7, 0.4);
+            animation: infinity-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes infinity-glow {
+            0%, 100% {
+                box-shadow: 0 0 24px rgba(255, 193, 7, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 32px rgba(255, 193, 7, 0.6);
+            }
+        }
+
+        .btn-infinity {
+            width: 100%;
+            min-height: 140px;
+            padding: 24px;
+            background: linear-gradient(135deg, var(--yellow) 0%, var(--orange) 100%);
+            color: #1a1a1a;
+            border: 3px solid white;
+            font-weight: 800;
+            box-shadow: 0 8px 24px rgba(255, 193, 7, 0.4);
+            cursor: pointer;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-infinity:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(255, 193, 7, 0.5);
+        }
+
+        .btn-infinity:active {
+            transform: translateY(-2px);
+        }
+
+        .btn-icon-large {
+            font-size: 56px;
+            line-height: 1;
+        }
+
+        .btn-label-large {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        /* Pads Grid */
+        .pads-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .pad-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1;
+            min-height: 90px;
+            padding: 12px;
+            background: linear-gradient(135deg, #546e7a 0%, #37474f 100%);
+            color: #eceff1;
+            border: 2px solid #90a4ae;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pad-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+        }
+
+        .pad-btn:active {
+            transform: scale(0.95);
+        }
+
+        .pad-btn.active {
+            background: linear-gradient(135deg, #00c853 0%, #00a040 100%);
+            color: white;
+            border-color: #69f0ae;
+            box-shadow: 0 0 16px rgba(0, 200, 83, 0.6);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+
+            .button-group {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .btn {
+                min-height: 90px;
+                font-size: 11px;
+            }
+
+            .btn-icon {
+                font-size: 32px;
+            }
+
+            .pads-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                font-size: 20px;
+            }
+
+            .button-group {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .btn {
+                min-height: 85px;
+                padding: 12px 8px;
+                font-size: 10px;
+            }
+
+            .btn-icon {
+                font-size: 28px;
+            }
+
+            .pads-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .pad-btn {
+                min-height: 70px;
+                font-size: 16px;
+            }
+
+            .btn-infinity {
+                min-height: 120px;
+            }
+
+            .btn-icon-large {
+                font-size: 48px;
+            }
+
+            .btn-label-large {
+                font-size: 14px;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">🎵 MIDI Playback Control - Stage Design</div>
+
+    <div class="container">
+        <!-- Connection Status -->
+        <div class="connection-status">
+            <span class="status-dot"></span>
+            <span>Connected to iPad • 192.168.1.100:5004</span>
+        </div>
+
+        <!-- Track Info -->
+        <div class="track-info">
+            <div class="track-name">🎵 Amazing Grace</div>
+            <div class="track-time">02:34 / 05:00</div>
+            <div class="track-section">📍 Verso</div>
+        </div>
+
+        <!-- Grid -->
+        <div class="grid-wrapper">
+
+            <!-- Section 1: Reprodução -->
+            <div class="section playback-section">
+                <div class="section-title">Reprodução Básica</div>
+                <div class="button-group">
+                    <button class="btn btn-primary">
+                        <span class="btn-icon">▶️</span>
+                        <span class="btn-label">Play</span>
+                    </button>
+                    <button class="btn btn-primary">
+                        <span class="btn-icon">⏸️</span>
+                        <span class="btn-label">Pause</span>
+                    </button>
+                    <button class="btn btn-danger">
+                        <span class="btn-icon">⏹️</span>
+                        <span class="btn-label">Stop</span>
+                    </button>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-secondary">
+                        <span class="btn-icon">⏮️</span>
+                        <span class="btn-label">Previous</span>
+                    </button>
+                    <button class="btn btn-secondary">
+                        <span class="btn-icon">⏭️</span>
+                        <span class="btn-label">Next</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 2: Loops -->
+            <div class="section loop-section">
+                <div class="section-title">Loops e Repetição</div>
+                <div class="button-group">
+                    <button class="btn btn-info">
+                        <span class="btn-icon">📍</span>
+                        <span class="btn-label">Loop Section</span>
+                    </button>
+                    <button class="btn btn-info">
+                        <span class="btn-icon">🔁</span>
+                        <span class="btn-label">Repeat</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 3: BONUS - Infinity Loop -->
+            <div class="section infinity-section">
+                <button class="btn-infinity">
+                    <span class="btn-icon-large">∞</span>
+                    <span class="btn-label-large">Loop Infinito</span>
+                </button>
+            </div>
+
+            <!-- Section 4: Pads -->
+            <div class="section pads-section">
+                <div class="section-title">Pads</div>
+                <div class="pads-grid">
+                    <button class="pad-btn">1</button>
+                    <button class="pad-btn active">2 ✓</button>
+                    <button class="pad-btn">3</button>
+                    <button class="pad-btn">4</button>
+                    <button class="pad-btn">5</button>
+                    <button class="pad-btn active">6 ✓</button>
+                    <button class="pad-btn">7</button>
+                    <button class="pad-btn">8</button>
+                </div>
+            </div>
+
+            <!-- Section 5: Audio -->
+            <div class="section audio-section">
+                <div class="section-title">Volume e Áudio</div>
+                <div class="button-group">
+                    <button class="btn btn-warning">
+                        <span class="btn-icon">🔊</span>
+                        <span class="btn-label">Fade In</span>
+                    </button>
+                    <button class="btn btn-warning">
+                        <span class="btn-icon">🔇</span>
+                        <span class="btn-label">Fade Out</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="footer">
+        <strong>Preview Design</strong> - Clique nos botões para ver as interações | Responsive para Mobile/Tablet/Desktop
+    </div>
+
+    <script>
+        // Add click interactions for preview
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                console.log('Clicked:', this.textContent.trim());
+                // Visual feedback
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 100);
+            });
+        });
+
+        document.querySelectorAll('.pad-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const padNumber = this.textContent.trim().split(' ')[0];
+                console.log('Pad', padNumber, this.classList.contains('active') ? 'ON' : 'OFF');
+            });
+        });
+    </script>
+</body>
+</html>
