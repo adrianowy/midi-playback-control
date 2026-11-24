@@ -1,0 +1,218 @@
+.pad-indicator {
+  padding: 1.5rem;
+  background: rgba(100, 116, 139, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  margin-bottom: 2rem;
+
+  /* Title */
+  &__title {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  /* Grid of Pads */
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Individual Pad */
+  &__pad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 12px;
+    background: white;
+    border: 2px solid #cbd5e1;
+    cursor: default;
+    transition: all 0.3s ease;
+    user-select: none;
+
+    &--active {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border-color: #16a34a;
+      color: white;
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+      transform: scale(1.05);
+
+      .pad-indicator__icon {
+        animation: pulse 1.5s ease-in-out infinite;
+
+        @keyframes pulse {
+          0%,
+          100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.2);
+          }
+        }
+      }
+    }
+
+    &--inactive {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #64748b;
+      opacity: 0.7;
+    }
+  }
+
+  /* Pad Icon */
+  &__icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  /* Pad Label */
+  &__label {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  /* Legend */
+  &__legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(100, 116, 139, 0.2);
+    font-size: 0.9rem;
+    color: #64748b;
+  }
+
+  &__legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__legend-icon {
+    font-size: 1.25rem;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .pad-indicator {
+    background: rgba(51, 65, 85, 0.2);
+    border-color: rgba(100, 116, 139, 0.3);
+
+    &__title {
+      color: #e2e8f0;
+    }
+
+    &__pad {
+      background: #1e293b;
+      border-color: #334155;
+      color: #94a3b8;
+
+      &--inactive {
+        background: #0f172a;
+        border-color: #334155;
+        color: #64748b;
+      }
+    }
+
+    &__legend {
+      border-color: rgba(100, 116, 139, 0.3);
+      color: #94a3b8;
+    }
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .pad-indicator {
+    &__grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+    }
+
+    &__pad {
+      padding: 0.75rem;
+
+      &--active {
+        transform: scale(1.03);
+      }
+    }
+
+    &__icon {
+      font-size: 1.75rem;
+    }
+
+    &__label {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .pad-indicator {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+
+    &__title {
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    &__grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+
+    &__pad {
+      padding: 0.6rem;
+      border-radius: 10px;
+
+      &--active {
+        transform: scale(1.02);
+      }
+    }
+
+    &__icon {
+      font-size: 1.5rem;
+    }
+
+    &__label {
+      font-size: 0.75rem;
+    }
+
+    &__legend {
+      gap: 1.5rem;
+      font-size: 0.8rem;
+    }
+
+    &__legend-icon {
+      font-size: 1rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .pad-indicator {
+    &__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+
+    &__pad {
+      padding: 0.75rem;
+    }
+
+    &__legend {
+      flex-direction: column;
+      gap: 0.75rem;
+      text-align: center;
+    }
+  }
+}

@@ -1,0 +1,165 @@
+.progress-bar {
+  padding: 1.5rem;
+  background: rgba(100, 116, 139, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  margin-bottom: 2rem;
+
+  /* Status Display */
+  &__status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  &__icon {
+    font-size: 1.25rem;
+  }
+
+  &__label {
+    font-size: 0.95rem;
+  }
+
+  /* Main Container */
+  &__container {
+    display: grid;
+    grid-template-columns: 50px 1fr 50px;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Time Display */
+  &__time {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+
+    &--current {
+      text-align: left;
+    }
+
+    &--total {
+      text-align: right;
+    }
+  }
+
+  /* Progress Track */
+  &__track {
+    position: relative;
+    height: 8px;
+    background: #cbd5e1;
+    border-radius: 4px;
+    overflow: visible;
+    cursor: pointer;
+    transition: height 0.2s ease;
+
+    &:hover {
+      height: 10px;
+
+      .progress-bar__thumb {
+        opacity: 1;
+      }
+    }
+  }
+
+  /* Progress Fill */
+  &__fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #1e40af);
+    border-radius: 4px;
+    transition: width 0.1s linear;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  }
+
+  /* Playhead Indicator */
+  &__thumb {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    background: #1e40af;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  /* Remaining Time */
+  &__remaining {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+
+    span {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 20px;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .progress-bar {
+    background: rgba(51, 65, 85, 0.2);
+    border-color: rgba(100, 116, 139, 0.3);
+
+    &__status {
+      color: #e2e8f0;
+    }
+
+    &__time {
+      color: #94a3b8;
+    }
+
+    &__track {
+      background: #334155;
+    }
+
+    &__remaining span {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+    }
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .progress-bar {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+
+    &__container {
+      grid-template-columns: 45px 1fr 45px;
+      gap: 0.5rem;
+    }
+
+    &__time {
+      font-size: 0.8rem;
+    }
+
+    &__track {
+      height: 6px;
+
+      &:hover {
+        height: 8px;
+      }
+    }
+
+    &__thumb {
+      width: 14px;
+      height: 14px;
+    }
+  }
+}

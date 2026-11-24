@@ -1,0 +1,24 @@
+<div [class]="'pad-indicator ' + cssClass">
+  <h3 class="pad-indicator__title">📱 Estados dos Pads</h3>
+
+  <div class="pad-indicator__grid">
+    <div
+      *ngFor="let pad of pads"
+      [class]="getPadClass(pad)"
+      [attr.data-pad-id]="pad.id"
+      [title]="pad.label + (pad.isActive ? ' - Ligado' : ' - Desligado')"
+    >
+      <span class="pad-indicator__icon">{{ getPadIcon(pad) }}</span>
+      <span class="pad-indicator__label">{{ pad.label }}</span>
+    </div>
+  </div>
+
+  <div class="pad-indicator__legend">
+    <span class="pad-indicator__legend-item">
+      <span class="pad-indicator__legend-icon">🔴</span> Ativo
+    </span>
+    <span class="pad-indicator__legend-item">
+      <span class="pad-indicator__legend-icon">⭕</span> Inativo
+    </span>
+  </div>
+</div>
