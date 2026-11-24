@@ -1,31 +1,31 @@
-<div [class]="'progress-bar ' + cssClass">
+<div class="progress-bar">
   <!-- Status Indicator -->
   <div class="progress-bar__status">
-    <span class="progress-bar__icon">{{ playbackIcon }}</span>
-    <span class="progress-bar__label">{{ playbackIndicator }}</span>
+    <span class="progress-bar__icon">{{ playbackIcon() }}</span>
+    <span class="progress-bar__label">{{ playbackIndicator() }}</span>
   </div>
 
   <!-- Progress Bar Container -->
   <div class="progress-bar__container">
     <!-- Current Time -->
     <div class="progress-bar__time progress-bar__time--current">
-      {{ formatTime(currentTime) }}
+      {{ formatTime(currentTime()) }}
     </div>
 
     <!-- Progress Bar Itself -->
     <div class="progress-bar__track">
-      <div class="progress-bar__fill" [style.width.%]="progressPercentage"></div>
-      <div class="progress-bar__thumb" [style.left.%]="progressPercentage"></div>
+      <div class="progress-bar__fill" [style.width.%]="progressPercentage()"></div>
+      <div class="progress-bar__thumb" [style.left.%]="progressPercentage()"></div>
     </div>
 
     <!-- Total Time -->
     <div class="progress-bar__time progress-bar__time--total">
-      {{ formatTime(totalTime) }}
+      {{ formatTime(totalTime()) }}
     </div>
   </div>
 
   <!-- Time Remaining -->
   <div class="progress-bar__remaining">
-    <span>Restante: {{ formatTime(totalTime - currentTime) }}</span>
+    <span>Restante: {{ timeRemaining() }}</span>
   </div>
 </div>

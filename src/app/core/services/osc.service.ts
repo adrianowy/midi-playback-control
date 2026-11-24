@@ -4,16 +4,10 @@
  * Handles bidirectional communication with iPad Playback via OSC.
  * OSC runs over UDP and provides lightweight real-time telemetry exchange.
  *
- * This service:
- * 1. Opens a UDP listener on local port for incoming OSC messages
- * 2. Parses OSC messages received from iPad Playback
- * 3. Extracts telemetry data and publishes via RxJS Observables
- * 4. Maintains playback state reactively
+ * Uses Angular Signals for reactive state management.
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Injectable, signal, computed, effect } from '@angular/core';
 
 import {
   OscMessage,
@@ -48,70 +42,75 @@ const DEFAULT_OSC_CONFIG: OscListenerConfig = {
 @Injectable({
   providedIn: 'root',
 })
-export class OscService implements OnDestroy {
+export class OscService {
   private config: OscListenerConfig = DEFAULT_OSC_CONFIG;
   private udpSocket: any = null;
-  private messageBuffer: OscMessage[] = [];
+  private messageBuffer = signal<OscMessage[]>([]);
   private readonly MAX_BUFFER_SIZE = 100;
 
   /**
-   * Observable stream of parsed OSC messages
+   * Signal for parsed OSC messages
    */
-  private messageSubject = new Subject<OscMessage>();
-  public message$ = this.messageSubject.asObservable();
+  private messageSignal = signal<OscMessage | null>(null);
+  readonly message = this.messageSignal.asReadonly();
 
   /**
-   * Observable stream of playback status updates
+   * Signal for playback status updates
    */
-  private statusSubject = new BehaviorSubject<OscPlaybackStatus>({});
-  public playbackStatus$ = this.statusSubject.asObservable();
+  readonly playbackStatus = signal<OscPlaybackStatus>({});
 
   /**
-   * Observable for session state changes
+   * Signal for session state changes
    */
-  private sessionStateSubject = new BehaviorSubject<OscSessionState>(
-    OscSessionState.IDLE
+  readonly sessionState = signal<OscSessionState>(OscSessionState.IDLE);
+
+  /**
+   * Signal for errors
+   */
+  private errorSignal = signal<OscError | null>(null);
+  readonly error = this.errorSignal.asReadonly();
+
+  /**
+   * Computed signal for checking if currently listening
+   */
+  readonly isListening = computed(
+    () => this.sessionState() === OscSessionState.LISTENING
   );
-  public sessionState$ = this.sessionStateSubject.asObservable();
 
   /**
-   * Observable for errors
+   * Computed signal for checking if there's an active error
    */
-  private errorSubject = new Subject<OscError>();
-  public error$ = this.errorSubject.asObservable();
-
-  /**
-   * Cleanup subject for memory management
-   */
-  private destroy$ = new Subject<void>();
+  readonly hasError = computed(() => this.sessionState() === OscSessionState.ERROR);
 
   constructor() {
-    this.initializeListeners();
+    this.initializeEffects();
   }
 
   /**
-   * Initialize internal listeners
+   * Initialize reactive effects
    */
-  private initializeListeners(): void {
-    this.message$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((message) => {
+  private initializeEffects(): void {
+    effect(() => {
+      const message = this.message();
+      if (message) {
         this.addToMessageBuffer(message);
         const status = OscParser.extractPlaybackStatus(message);
-        const current = this.statusSubject.value;
-        this.statusSubject.next({ ...current, ...status });
+        const current = this.playbackStatus();
+        this.playbackStatus.set({ ...current, ...status });
 
         if (this.config.enableLogging) {
           console.log('OSC Message:', message);
         }
-      });
+      }
+    });
 
-    this.error$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((error) => {
+    effect(() => {
+      const error = this.error();
+      if (error) {
         console.error('OSC Error:', error);
-        this.sessionStateSubject.next(OscSessionState.ERROR);
-      });
+        this.sessionState.set(OscSessionState.ERROR);
+      }
+    });
   }
 
   /**
@@ -121,18 +120,15 @@ export class OscService implements OnDestroy {
   async startListening(config?: Partial<OscListenerConfig>): Promise<void> {
     try {
       this.config = { ...DEFAULT_OSC_CONFIG, ...config };
-      this.sessionStateSubject.next(OscSessionState.LISTENING);
+      this.sessionState.set(OscSessionState.LISTENING);
 
-      // Note: Actual UDP socket implementation requires @capacitor-community/udp
-      // which provides the UDPSocket class. This is a placeholder that emulates
-      // the listening behavior. In production, integrate with the UDP plugin.
       this.startUdpListener();
     } catch (error) {
       const oscError = new OscError(
         OscErrorType.CONNECTION_ERROR,
         `Failed to start OSC listener on port ${this.config.localPort}: ${error}`
       );
-      this.errorSubject.next(oscError);
+      this.errorSignal.set(oscError);
       throw oscError;
     }
   }
@@ -143,16 +139,15 @@ export class OscService implements OnDestroy {
   async stopListening(): Promise<void> {
     try {
       if (this.udpSocket) {
-        // Close UDP socket if available
         this.udpSocket = null;
       }
-      this.sessionStateSubject.next(OscSessionState.CLOSED);
+      this.sessionState.set(OscSessionState.CLOSED);
     } catch (error) {
       const oscError = new OscError(
         OscErrorType.SOCKET_ERROR,
         `Error closing OSC socket: ${error}`
       );
-      this.errorSubject.next(oscError);
+      this.errorSignal.set(oscError);
       throw oscError;
     }
   }
@@ -193,7 +188,7 @@ export class OscService implements OnDestroy {
           OscErrorType.SOCKET_ERROR,
           `Error receiving OSC message: ${error}`
         );
-        this.errorSubject.next(oscError);
+        this.errorSignal.set(oscError);
       }
     }
   }
@@ -218,7 +213,7 @@ export class OscService implements OnDestroy {
 
       const timestamp = Date.now();
       const message = OscParser.parseMessage(uint8Data, timestamp);
-      this.messageSubject.next(message);
+      this.messageSignal.set(message);
     } catch (error) {
       const oscError =
         error instanceof OscError
@@ -227,7 +222,7 @@ export class OscService implements OnDestroy {
               OscErrorType.PARSE_ERROR,
               `Error parsing OSC message: ${error}`
             );
-      this.errorSubject.next(oscError);
+      this.errorSignal.set(oscError);
     }
   }
 
@@ -235,49 +230,35 @@ export class OscService implements OnDestroy {
    * Get current playback status
    */
   getCurrentStatus(): OscPlaybackStatus {
-    return this.statusSubject.value;
+    return this.playbackStatus();
   }
 
   /**
    * Get current session state
    */
   getCurrentSessionState(): OscSessionState {
-    return this.sessionStateSubject.value;
+    return this.sessionState();
   }
 
   /**
    * Get buffered messages (last N messages)
    */
   getMessageBuffer(): OscMessage[] {
-    return [...this.messageBuffer];
+    return this.messageBuffer();
   }
 
   /**
    * Clear message buffer
    */
   clearMessageBuffer(): void {
-    this.messageBuffer = [];
+    this.messageBuffer.set([]);
   }
 
   /**
    * Reset status to empty state
    */
   resetStatus(): void {
-    this.statusSubject.next({});
-  }
-
-  /**
-   * Check if currently listening for messages
-   */
-  isListening(): boolean {
-    return this.sessionStateSubject.value === OscSessionState.LISTENING;
-  }
-
-  /**
-   * Check if there's an active error
-   */
-  hasError(): boolean {
-    return this.sessionStateSubject.value === OscSessionState.ERROR;
+    this.playbackStatus.set({});
   }
 
   /**
@@ -301,18 +282,11 @@ export class OscService implements OnDestroy {
    * Add message to circular buffer
    */
   private addToMessageBuffer(message: OscMessage): void {
-    this.messageBuffer.push(message);
-    if (this.messageBuffer.length > this.MAX_BUFFER_SIZE) {
-      this.messageBuffer.shift();
+    const buffer = this.messageBuffer();
+    const updated = [...buffer, message];
+    if (updated.length > this.MAX_BUFFER_SIZE) {
+      updated.shift();
     }
-  }
-
-  /**
-   * Cleanup on service destruction
-   */
-  ngOnDestroy(): void {
-    this.stopListening().catch();
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.messageBuffer.set(updated);
   }
 }

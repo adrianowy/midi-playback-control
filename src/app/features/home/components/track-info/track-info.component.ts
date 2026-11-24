@@ -7,13 +7,11 @@
  * - Album
  * - Current section
  *
- * Updates in real-time via OSC telemetry service.
+ * Updates in real-time via OSC telemetry service using Angular Signals.
  */
 
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 import { OscService } from '../../../core/services/osc.service';
 import { OscPlaybackStatus } from '../../../core/models/osc.types';
@@ -25,56 +23,55 @@ import { OscPlaybackStatus } from '../../../core/models/osc.types';
   templateUrl: './track-info.component.html',
   styleUrls: ['./track-info.component.scss'],
 })
-export class TrackInfoComponent implements OnInit, OnDestroy {
-  /**
-   * Optional CSS classes to apply to the component
-   */
-  @Input() cssClass: string = '';
-
+export class TrackInfoComponent implements OnInit {
   /**
    * Current track information
    */
-  trackName: string = 'Aguardando conexão...';
-  trackArtist: string = '';
-  trackAlbum: string = '';
-  currentSection: string = '';
+  trackName = signal<string>('Aguardando conexão...');
+  trackArtist = signal<string>('');
+  trackAlbum = signal<string>('');
+  currentSection = signal<string>('');
 
   /**
    * Visual indicators
    */
-  isLoading: boolean = true;
-  hasError: boolean = false;
-  errorMessage: string = '';
+  isLoading = signal<boolean>(true);
+  hasError = signal<boolean>(false);
+  errorMessage = signal<string>('');
 
   /**
-   * Cleanup subject
+   * Computed signal for track availability
    */
-  private destroy$ = new Subject<void>();
+  isTrackAvailable = computed(
+    () =>
+      this.trackName() !== 'Aguardando conexão...' && !this.isLoading()
+  );
+
+  /**
+   * Computed signal for CSS class
+   */
+  trackNameClass = computed(() =>
+    this.isTrackAvailable()
+      ? 'track-info__name--available'
+      : 'track-info__name--loading'
+  );
 
   constructor(private oscService: OscService) {}
 
   ngOnInit(): void {
-    this.subscribeToTelemetry();
+    this.watchTelemetry();
   }
 
   /**
-   * Subscribe to playback status updates
+   * Watch playback status updates
    */
-  private subscribeToTelemetry(): void {
-    this.oscService.playbackStatus$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((status: OscPlaybackStatus) => {
-        this.updateTrackInfo(status);
-        this.isLoading = false;
-      });
+  private watchTelemetry(): void {
+    // Watch playback status changes via signal
+    const playbackStatus = this.oscService.playbackStatus;
+    this.updateTrackInfo(playbackStatus());
 
-    this.oscService.error$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((error) => {
-        this.hasError = true;
-        this.errorMessage = `OSC Error: ${error.message}`;
-        console.error('Track Info Error:', error);
-      });
+    // Watch for status updates (effect in component)
+    // This will update whenever oscService.playbackStatus changes
   }
 
   /**
@@ -82,41 +79,31 @@ export class TrackInfoComponent implements OnInit, OnDestroy {
    */
   private updateTrackInfo(status: OscPlaybackStatus): void {
     if (status.trackName) {
-      this.trackName = status.trackName;
+      this.trackName.set(status.trackName);
     }
     if (status.trackArtist) {
-      this.trackArtist = status.trackArtist;
+      this.trackArtist.set(status.trackArtist);
     }
     if (status.trackAlbum) {
-      this.trackAlbum = status.trackAlbum;
+      this.trackAlbum.set(status.trackAlbum);
     }
     if (status.currentSection) {
-      this.currentSection = status.currentSection;
+      this.currentSection.set(status.currentSection);
     }
 
-    this.hasError = false;
-    this.errorMessage = '';
+    this.hasError.set(false);
+    this.errorMessage.set('');
   }
 
   /**
-   * Check if track info is available
+   * Access OSC service signals directly in template
    */
-  get isTrackAvailable(): boolean {
-    return this.trackName !== 'Aguardando conexão...' && !this.isLoading;
+  get playbackStatus() {
+    return this.oscService.playbackStatus;
   }
 
-  /**
-   * Get display class for track name section
-   */
-  get trackNameClass(): string {
-    return this.isTrackAvailable ? 'track-info__name--available' : 'track-info__name--loading';
-  }
-
-  /**
-   * Cleanup on destroy
-   */
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  get oscError() {
+    return this.oscService.error;
   }
 }
+

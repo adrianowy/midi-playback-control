@@ -1,39 +1,51 @@
-<div [class]="'track-info ' + cssClass">
+<div class="track-info">
   <!-- Loading State -->
-  <div *ngIf="isLoading" class="track-info__loading">
-    <div class="track-info__spinner"></div>
-    <p class="track-info__status">Carregando informações...</p>
-  </div>
+  @if (isLoading()) {
+    <div class="track-info__loading">
+      <div class="track-info__spinner"></div>
+      <p class="track-info__status">Carregando informações...</p>
+    </div>
+  }
 
   <!-- Error State -->
-  <div *ngIf="hasError && !isLoading" class="track-info__error">
-    <p class="track-info__status">❌ {{ errorMessage }}</p>
-  </div>
+  @if (hasError() && !isLoading()) {
+    <div class="track-info__error">
+      <p class="track-info__status">❌ {{ errorMessage() }}</p>
+    </div>
+  }
 
   <!-- Track Information -->
-  <div *ngIf="!isLoading && !hasError" class="track-info__content">
-    <!-- Track Name -->
-    <div class="track-info__name" [ngClass]="trackNameClass">
-      <h2 class="track-info__title">🎵 {{ trackName }}</h2>
-    </div>
-
-    <!-- Artist and Album -->
-    <div class="track-info__metadata">
-      <div *ngIf="trackArtist" class="track-info__artist">
-        <span class="track-info__label">Artista:</span>
-        <span class="track-info__value">{{ trackArtist }}</span>
+  @if (!isLoading() && !hasError()) {
+    <div class="track-info__content">
+      <!-- Track Name -->
+      <div class="track-info__name" [ngClass]="trackNameClass()">
+        <h2 class="track-info__title">🎵 {{ trackName() }}</h2>
       </div>
 
-      <div *ngIf="trackAlbum" class="track-info__album">
-        <span class="track-info__label">Álbum:</span>
-        <span class="track-info__value">{{ trackAlbum }}</span>
-      </div>
-    </div>
+      <!-- Artist and Album -->
+      <div class="track-info__metadata">
+        @if (trackArtist()) {
+          <div class="track-info__artist">
+            <span class="track-info__label">Artista:</span>
+            <span class="track-info__value">{{ trackArtist() }}</span>
+          </div>
+        }
 
-    <!-- Current Section -->
-    <div *ngIf="currentSection" class="track-info__section">
-      <span class="track-info__label">📍 Seção Atual:</span>
-      <span class="track-info__value">{{ currentSection }}</span>
+        @if (trackAlbum()) {
+          <div class="track-info__album">
+            <span class="track-info__label">Álbum:</span>
+            <span class="track-info__value">{{ trackAlbum() }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Current Section -->
+      @if (currentSection()) {
+        <div class="track-info__section">
+          <span class="track-info__label">📍 Seção Atual:</span>
+          <span class="track-info__value">{{ currentSection() }}</span>
+        </div>
+      }
     </div>
-  </div>
+  }
 </div>

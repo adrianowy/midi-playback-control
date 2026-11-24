@@ -5,12 +5,12 @@
  * - Visual representation of each pad (on/off)
  * - Updates in real-time
  * - Touch-friendly interface
+ *
+ * Uses Angular Signals for reactive state.
  */
 
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 import { OscService } from '../../../core/services/osc.service';
 import { OscPlaybackStatus } from '../../../core/models/osc.types';
@@ -31,26 +31,16 @@ interface PadState {
   templateUrl: './pad-indicator.component.html',
   styleUrls: ['./pad-indicator.component.scss'],
 })
-export class PadIndicatorComponent implements OnInit, OnDestroy {
-  /**
-   * Optional CSS classes
-   */
-  @Input() cssClass: string = '';
-
+export class PadIndicatorComponent implements OnInit {
   /**
    * Array of 8 pad states
    */
-  pads: PadState[] = this.initializePads();
-
-  /**
-   * Cleanup subject
-   */
-  private destroy$ = new Subject<void>();
+  pads = signal<PadState[]>(this.initializePads());
 
   constructor(private oscService: OscService) {}
 
   ngOnInit(): void {
-    this.subscribeToTelemetry();
+    this.watchTelemetry();
   }
 
   /**
@@ -65,14 +55,11 @@ export class PadIndicatorComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Subscribe to playback status updates
+   * Watch playback status updates
    */
-  private subscribeToTelemetry(): void {
-    this.oscService.playbackStatus$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((status: OscPlaybackStatus) => {
-        this.updatePadStates(status);
-      });
+  private watchTelemetry(): void {
+    const status = this.oscService.playbackStatus();
+    this.updatePadStates(status);
   }
 
   /**
@@ -80,11 +67,12 @@ export class PadIndicatorComponent implements OnInit, OnDestroy {
    */
   private updatePadStates(status: OscPlaybackStatus): void {
     if (status.padStates && Array.isArray(status.padStates)) {
-      status.padStates.forEach((isActive, index) => {
-        if (index < this.pads.length) {
-          this.pads[index].isActive = isActive;
-        }
-      });
+      const currentPads = this.pads();
+      const updated = currentPads.map((pad, index) => ({
+        ...pad,
+        isActive: status.padStates![index] || false,
+      }));
+      this.pads.set(updated);
     }
   }
 
@@ -103,12 +91,5 @@ export class PadIndicatorComponent implements OnInit, OnDestroy {
   getPadIcon(pad: PadState): string {
     return pad.isActive ? '🔴' : '⭕';
   }
-
-  /**
-   * Cleanup on destroy
-   */
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 }
+

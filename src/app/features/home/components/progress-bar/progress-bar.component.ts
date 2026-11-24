@@ -5,12 +5,12 @@
  * - Progress bar visualization
  * - Current time / Total time
  * - Real-time updates from OSC telemetry
+ *
+ * Uses Angular Signals for reactive state.
  */
 
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 import { OscService } from '../../../core/services/osc.service';
 import { OscPlaybackStatus } from '../../../core/models/osc.types';
@@ -22,43 +22,58 @@ import { OscPlaybackStatus } from '../../../core/models/osc.types';
   templateUrl: './progress-bar.component.html',
   styleUrls: ['./progress-bar.component.scss'],
 })
-export class ProgressBarComponent implements OnInit, OnDestroy {
-  /**
-   * Optional CSS classes
-   */
-  @Input() cssClass: string = '';
-
+export class ProgressBarComponent implements OnInit {
   /**
    * Time information
    */
-  currentTime: number = 0;
-  totalTime: number = 0;
+  currentTime = signal<number>(0);
+  totalTime = signal<number>(0);
 
   /**
    * Playback state
    */
-  isPlaying: boolean = false;
+  isPlaying = signal<boolean>(false);
 
   /**
-   * Cleanup subject
+   * Computed signal for progress percentage (0-100)
    */
-  private destroy$ = new Subject<void>();
+  progressPercentage = computed(() => {
+    const total = this.totalTime();
+    if (total === 0) return 0;
+    return Math.min((this.currentTime() / total) * 100, 100);
+  });
+
+  /**
+   * Computed signal for playback indicator text
+   */
+  playbackIndicator = computed(() =>
+    this.isPlaying() ? '▶ Reproduzindo' : '⏸ Pausado'
+  );
+
+  /**
+   * Computed signal for playback icon
+   */
+  playbackIcon = computed(() => (this.isPlaying() ? '▶' : '⏸'));
+
+  /**
+   * Computed signal for time remaining
+   */
+  timeRemaining = computed(() =>
+    this.formatTime(Math.max(0, this.totalTime() - this.currentTime()))
+  );
 
   constructor(private oscService: OscService) {}
 
   ngOnInit(): void {
-    this.subscribeToTelemetry();
+    this.watchTelemetry();
   }
 
   /**
-   * Subscribe to playback status updates
+   * Watch playback status updates
    */
-  private subscribeToTelemetry(): void {
-    this.oscService.playbackStatus$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((status: OscPlaybackStatus) => {
-        this.updateProgress(status);
-      });
+  private watchTelemetry(): void {
+    const status = this.oscService.playbackStatus();
+    this.updateProgress(status);
   }
 
   /**
@@ -66,22 +81,14 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
    */
   private updateProgress(status: OscPlaybackStatus): void {
     if (status.timePosition !== undefined) {
-      this.currentTime = status.timePosition;
+      this.currentTime.set(status.timePosition);
     }
     if (status.timeDuration !== undefined) {
-      this.totalTime = status.timeDuration;
+      this.totalTime.set(status.timeDuration);
     }
     if (status.isPlaying !== undefined) {
-      this.isPlaying = status.isPlaying;
+      this.isPlaying.set(status.isPlaying);
     }
-  }
-
-  /**
-   * Get progress percentage (0-100)
-   */
-  get progressPercentage(): number {
-    if (this.totalTime === 0) return 0;
-    return Math.min((this.currentTime / this.totalTime) * 100, 100);
   }
 
   /**
@@ -97,24 +104,10 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get play/pause indicator
+   * Access OSC service signals directly in template
    */
-  get playbackIndicator(): string {
-    return this.isPlaying ? '▶ Reproduzindo' : '⏸ Pausado';
-  }
-
-  /**
-   * Get play/pause icon
-   */
-  get playbackIcon(): string {
-    return this.isPlaying ? '▶' : '⏸';
-  }
-
-  /**
-   * Cleanup on destroy
-   */
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  get playbackStatus() {
+    return this.oscService.playbackStatus;
   }
 }
+
