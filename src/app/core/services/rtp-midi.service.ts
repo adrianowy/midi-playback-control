@@ -131,6 +131,7 @@ export class RtpMidiService implements OnDestroy {
         .subscribe({
           next: () => {
             // Step 2: Handshake on data port
+            this.#performDataPortHandshake()
               .pipe(
                 timeout(NETWORK.HANDSHAKE_TIMEOUT_MS),
                 catchError(error => {
