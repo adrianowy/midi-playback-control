@@ -8,8 +8,8 @@ import {
   IonButton,
 } from '@ionic/angular/standalone';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RtpMidiService } from '../../core/services/rtp-midi.service';
-import { ConnectionStatus } from '../../core/models/connection.types';
+import { RtpMidiService } from '@core/services/rtp-midi.service';
+import { ConnectionStatus } from '@core/models/connection.types';
 
 interface Pad {
   id: number;
@@ -32,7 +32,7 @@ interface Pad {
 })
 export class HomeComponent {
   // Static iPad configuration for MVP testing
-  private readonly IPAD_IP = '192.168.1.100';
+  private readonly IPAD_IP = '192.168.68.54';
   private readonly CONTROL_PORT = 5004;
   private readonly DATA_PORT = 5005;
 

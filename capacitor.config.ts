@@ -1,4 +1,6 @@
-{
+import type { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
   "name": "midi-playback-control",
   "plugins": {
     "@capacitor/splashscreen": {
@@ -12,10 +14,8 @@
   },
   "appId": "com.adrianowy.midiplaybackcontrol",
   "appName": "MIDI Playback Control",
-  "bundledWebRuntime": false,
-  "platforms": {
-    "android": {
-      "capacitorConfigName": "android"
-    }
-  }
-}
+  "webDir": "dist/midi-playback-control",
+  "bundledWebRuntime": false
+};
+
+export default config;

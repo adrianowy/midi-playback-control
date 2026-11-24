@@ -4,7 +4,7 @@
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProgressBarComponent } from './progress-bar.component';
-import { OscService } from '../../../core/services/osc.service';
+import { OscService } from '@core/services/osc.service';
 import { BehaviorSubject } from 'rxjs';
 
 describe('ProgressBarComponent', () => {

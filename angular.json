@@ -64,10 +64,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "midi-playback-control:build:production"
+              "buildTarget": "midi-playback-control:build:production"
             },
             "development": {
-              "browserTarget": "midi-playback-control:build:development"
+              "buildTarget": "midi-playback-control:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -75,7 +75,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "midi-playback-control:build"
+            "buildTarget": "midi-playback-control:build"
           }
         },
         "test": {

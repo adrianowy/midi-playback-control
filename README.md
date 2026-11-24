@@ -67,8 +67,7 @@ ionic.config.json             # Ionic CLI configuration
 
 ### Prerequisites
 - Node.js 18+ & npm
-- Ionic CLI: `npm install -g @ionic/cli`
-- Android SDK (for APK build)
+- Android Studio with the Android SDK and an Android Virtual Device (for Android development)
 - iPad with Playback app + Wi-Fi network
 
 ### Installation
@@ -80,13 +79,8 @@ cd midi-playback-control
 # Install dependencies
 npm install
 
-# Install Capacitor plugins
-npm install @capacitor/core @capacitor/android
-npm install @capacitor-community/udp
-
-# Initialize Capacitor for Android
-npx cap init
-npx cap add android
+# Create the Android project (once)
+npm run cap:add:android
 ```
 
 ### Development
@@ -94,6 +88,9 @@ npx cap add android
 ```bash
 # Start development server
 npm start
+
+# Start an Android emulator in Android Studio, then run with live reload
+npm run dev:android
 
 # Run linter
 npm run lint
@@ -110,6 +107,9 @@ npx cap sync android
 # Build APK
 npm run build:android
 ```
+
+The Android emulator can display the app, but RTP-MIDI networking cannot be
+tested yet: the UDP transport and AppleMIDI handshake are not implemented.
 
 ---
 

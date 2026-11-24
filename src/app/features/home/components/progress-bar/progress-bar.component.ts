@@ -12,8 +12,8 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { OscService } from '../../../core/services/osc.service';
-import { OscPlaybackStatus } from '../../../core/models/osc.types';
+import { OscService } from '@core/services/osc.service';
+import { OscPlaybackStatus } from '@core/models/osc.types';
 
 @Component({
   selector: 'app-progress-bar',

@@ -4,7 +4,7 @@
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TrackInfoComponent } from './track-info.component';
-import { OscService } from '../../../core/services/osc.service';
+import { OscService } from '@core/services/osc.service';
 import { BehaviorSubject } from 'rxjs';
 
 describe('TrackInfoComponent', () => {
