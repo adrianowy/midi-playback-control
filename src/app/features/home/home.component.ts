@@ -51,8 +51,18 @@ export class HomeComponent {
   readonly controlsDisabled = computed(() => !this.isConnected());
 
   constructor(private rtpMidiService: RtpMidiService) {
-    this.initializePads();
     this.setupConnectionMonitoring();
+    this.initializePads();
+  }
+
+  /**
+   * Monitor connection status from RtpMidiService
+   */
+  private setupConnectionMonitoring(): void {
+    effect(() => {
+      const status = this.rtpMidiService.connectionStatus();
+      this.connectionStatus.set(status);
+    });
   }
 
   /**
@@ -66,16 +76,6 @@ export class HomeComponent {
       }))
     );
     this.connectToPlayback();
-  }
-
-  /**
-   * Monitor connection status from RtpMidiService
-   */
-  private setupConnectionMonitoring(): void {
-    effect(() => {
-      const status = this.rtpMidiService.connectionStatus();
-      this.connectionStatus.set(status);
-    });
   }
 
   /**
