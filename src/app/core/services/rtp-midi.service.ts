@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, signal, computed, effect, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, throwError, timeout } from 'rxjs';
 import { catchError, takeUntil, tap } from 'rxjs/operators';
 import { MIDI, NETWORK } from '../constants';
@@ -15,14 +15,27 @@ import { MidiMessage } from '../models/midi.types';
  * - Session keep-alive with clock sync packets
  * - MIDI command serialization and transmission
  * - Error handling and automatic reconnection
+ *
+ * Uses Angular Signals for reactive state management.
  */
 @Injectable({
   providedIn: 'root',
 })
 export class RtpMidiService implements OnDestroy {
-  // ===== Public Observables =====
+  // ===== Public Observables (Legacy - for backward compatibility) =====
   connectionStatus$: Observable<ConnectionStatus>;
   midiReceived$: Observable<MidiMessage>;
+
+  // ===== Public Signals =====
+  readonly connectionStatus = signal<ConnectionStatus>(ConnectionStatus.IDLE);
+  readonly midiReceived = signal<MidiMessage | null>(null);
+  readonly isConnected = computed(
+    () => this.connectionStatus() === ConnectionStatus.CONNECTED
+  );
+  readonly isConnecting = computed(
+    () => this.connectionStatus() === ConnectionStatus.CONNECTING
+  );
+  readonly hasError = computed(() => this.connectionStatus() === ConnectionStatus.ERROR);
 
   // ===== Private Fields =====
   #destroy$ = new Subject<void>();
@@ -41,8 +54,29 @@ export class RtpMidiService implements OnDestroy {
   #rtpSequenceNumber = 0;
 
   constructor() {
+    // Legacy Observable support
     this.connectionStatus$ = this.#connectionStatusSubject.asObservable();
     this.midiReceived$ = this.#midiReceivedSubject.asObservable();
+
+    // Keep signals and observables in sync
+    this.#initializeEffects();
+  }
+
+  /**
+   * Initialize reactive effects to sync signals with observables
+   */
+  #initializeEffects(): void {
+    effect(() => {
+      const status = this.connectionStatus();
+      this.#connectionStatusSubject.next(status);
+    });
+
+    effect(() => {
+      const midi = this.midiReceived();
+      if (midi) {
+        this.#midiReceivedSubject.next(midi);
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -97,7 +131,6 @@ export class RtpMidiService implements OnDestroy {
         .subscribe({
           next: () => {
             // Step 2: Handshake on data port
-            this.#performDataPortHandshake()
               .pipe(
                 timeout(NETWORK.HANDSHAKE_TIMEOUT_MS),
                 catchError(error => {
@@ -406,6 +439,7 @@ export class RtpMidiService implements OnDestroy {
   }
 
   #updateStatus(status: ConnectionStatus): void {
+    this.connectionStatus.set(status);
     this.#connectionStatusSubject.next(status);
   }
 }
