@@ -228,13 +228,6 @@ export class RtpMidiService implements OnDestroy {
     return this.#sendMidiCommand(midiMessage);
   }
 
-  /**
-   * Check if currently connected
-   */
-  isConnected(): boolean {
-    return this.#connectionStatusSubject.value === ConnectionStatus.CONNECTED;
-  }
-
   // ===== Private Methods =====
 
   #performControlPortHandshake(): Observable<void> {
