@@ -7,9 +7,16 @@
 <ion-content [fullscreen]="true" class="bg-dark">
   <div class="container-fluid py-4">
     <!-- Connection Status -->
-    <div class="alert alert-success d-flex align-items-center gap-2 mb-3">
-      <span class="badge bg-success rounded-pill"></span>
-      <span>Connected to iPad • 192.168.1.100:5004</span>
+    <div [ngClass]="isConnected ? 'alert-success' : 'alert-danger'" class="alert d-flex align-items-center gap-2 mb-3">
+      <span class="badge" [ngClass]="isConnected ? 'bg-success' : 'bg-danger'" style="display: inline-block; width: 12px; height: 12px; border-radius: 50%;"></span>
+      <span *ngIf="isConnected" class="text-success">✓ Connected to iPad • 192.168.1.100:5004</span>
+      <span *ngIf="!isConnected && isLoading" class="text-info">🔄 Connecting...</span>
+      <span *ngIf="!isConnected && !isLoading" class="text-danger">✗ Disconnected</span>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="alert alert-danger mb-3">
+      <small>{{ errorMessage }}</small>
     </div>
 
     <!-- Current Track Info -->
@@ -31,7 +38,7 @@
             <h6 class="card-title text-uppercase text-info mb-3">Reprodução</h6>
             <div class="row g-2">
               <div class="col-4 col-md-2">
-                <button class="btn btn-success btn-lg w-100" (click)="onPlayClick()" style="min-height: 100px;">
+                <button class="btn btn-success btn-lg w-100" [disabled]="!isConnected" (click)="onPlayClick()" style="min-height: 100px;">
                   <div class="text-center">
                     <div style="font-size: 36px;">▶️</div>
                     <small>Play</small>
@@ -39,7 +46,7 @@
                 </button>
               </div>
               <div class="col-4 col-md-2">
-                <button class="btn btn-success btn-lg w-100" (click)="onPauseClick()" style="min-height: 100px;">
+                <button class="btn btn-success btn-lg w-100" [disabled]="!isConnected" (click)="onPauseClick()" style="min-height: 100px;">
                   <div class="text-center">
                     <div style="font-size: 36px;">⏸️</div>
                     <small>Pause</small>
@@ -47,7 +54,7 @@
                 </button>
               </div>
               <div class="col-4 col-md-2">
-                <button class="btn btn-danger btn-lg w-100" (click)="onStopClick()" style="min-height: 100px;">
+                <button class="btn btn-danger btn-lg w-100" [disabled]="!isConnected" (click)="onStopClick()" style="min-height: 100px;">
                   <div class="text-center">
                     <div style="font-size: 36px;">⏹️</div>
                     <small>Stop</small>
@@ -66,7 +73,7 @@
             <h6 class="card-title text-uppercase text-info mb-3">Loops</h6>
             <div class="row g-2">
               <div class="col-4 col-md-2">
-                <button class="btn btn-primary btn-lg w-100" (click)="onLoopSectionClick()" style="min-height: 100px;">
+                <button class="btn btn-primary btn-lg w-100" [disabled]="!isConnected" (click)="onLoopSectionClick()" style="min-height: 100px;">
                   <div class="text-center">
                     <div style="font-size: 36px;">📍</div>
                     <small>Loop Section</small>
@@ -74,7 +81,7 @@
                 </button>
               </div>
               <div class="col-4 col-md-2">
-                <button class="btn btn-primary btn-lg w-100" (click)="onRepeatClick()" style="min-height: 100px;">
+                <button class="btn btn-primary btn-lg w-100" [disabled]="!isConnected" (click)="onRepeatClick()" style="min-height: 100px;">
                   <div class="text-center">
                     <div style="font-size: 36px;">🔁</div>
                     <small>Repeat</small>
@@ -82,7 +89,7 @@
                 </button>
               </div>
               <div class="col-4 col-md-2">
-                <button class="btn btn-warning btn-lg w-100 text-dark" (click)="onInfinityLoopClick()" style="min-height: 100px;">
+                <button class="btn btn-warning btn-lg w-100 text-dark" [disabled]="!isConnected" (click)="onInfinityLoopClick()" style="min-height: 100px;">
                   <div class="text-center">
                     <div style="font-size: 36px;">∞</div>
                     <small>Loop Infinito</small>
@@ -103,6 +110,7 @@
               <div class="col-3 col-sm-2 col-md-1-5" *ngFor="let pad of pads; let i = index">
                 <button class="btn w-100" 
                         [ngClass]="pad.active ? 'btn-success' : 'btn-secondary'"
+                        [disabled]="!isConnected"
                         (click)="onPadClick(i)"
                         style="min-height: 90px; aspect-ratio: 1;">
                   <div class="text-center">
@@ -123,7 +131,7 @@
             <h6 class="card-title text-uppercase text-info mb-3">Áudio</h6>
             <div class="row g-2">
               <div class="col-6 col-md-2">
-                <button class="btn btn-warning btn-lg w-100 text-dark" (click)="onFadeInClick()" style="min-height: 100px;">
+                <button class="btn btn-warning btn-lg w-100 text-dark" [disabled]="!isConnected" (click)="onFadeInClick()" style="min-height: 100px;">
                   <div class="text-center">
                     <div style="font-size: 36px;">🔊</div>
                     <small>Fade In</small>
@@ -131,7 +139,7 @@
                 </button>
               </div>
               <div class="col-6 col-md-2">
-                <button class="btn btn-warning btn-lg w-100 text-dark" (click)="onFadeOutClick()" style="min-height: 100px;">
+                <button class="btn btn-warning btn-lg w-100 text-dark" [disabled]="!isConnected" (click)="onFadeOutClick()" style="min-height: 100px;">
                   <div class="text-center">
                     <div style="font-size: 36px;">🔇</div>
                     <small>Fade Out</small>
