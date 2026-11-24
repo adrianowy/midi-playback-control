@@ -53,7 +53,9 @@ export class HomeComponent {
 
   readonly controlsDisabled = computed(() => !this.isConnected());
 
-  constructor(private rtpMidiService: RtpMidiService) {
+  private rtpMidiService = inject(RtpMidiService);
+
+  constructor() {
     this.setupConnectionMonitoring();
     this.initializePads();
   }
