@@ -1,7 +1,8 @@
 import { Injectable, signal, computed, effect, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, throwError, timeout } from 'rxjs';
 import { catchError, takeUntil, tap } from 'rxjs/operators';
-import { MIDI, NETWORK } from '../constants';
+import { MIDI } from '../constants/midi.constants';
+import { NETWORK } from '../constants/network.constants';
 import { ConnectionError, HandshakeError, MidiProtocolError, NetworkTimeoutError } from '../models/errors';
 import { AppleMidiHandshakeState, ConnectionStatus } from '../models/connection.types';
 import { MidiMessage } from '../models/midi.types';
