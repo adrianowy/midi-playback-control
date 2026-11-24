@@ -1,4 +1,4 @@
-import { Component, signal, computed, effect } from '@angular/core';
+import { Component, signal, computed, effect, DestroyRef, inject } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -6,6 +6,7 @@ import {
   IonContent,
   IonButton,
 } from '@ionic/angular/standalone';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RtpMidiService } from '../../core/services/rtp-midi.service';
 import { ConnectionStatus } from '../../core/models/connection.types';
 
@@ -32,6 +33,8 @@ export class HomeComponent {
   private readonly IPAD_IP = '192.168.1.100';
   private readonly CONTROL_PORT = 5004;
   private readonly DATA_PORT = 5005;
+
+  private destroyRef = inject(DestroyRef);
 
   // State Signals
   readonly connectionStatus = signal(ConnectionStatus.IDLE);
@@ -84,6 +87,7 @@ export class HomeComponent {
   private connectToPlayback(): void {
     this.rtpMidiService
       .connect(this.IPAD_IP, this.CONTROL_PORT, this.DATA_PORT)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           console.log('[Home] Connected to Playback');
@@ -114,16 +118,18 @@ export class HomeComponent {
       ? this.rtpMidiService.sendControlChange(noteOrCC, velocity)
       : this.rtpMidiService.sendNoteOn(noteOrCC, velocity);
 
-    observable.subscribe({
-      next: () => {
-        console.log(`${actionName} sent`);
-        this.errorMessage.set(null);
-      },
-      error: (error) => {
-        console.error(`${actionName} error:`, error);
-        this.errorMessage.set(error.message);
-      },
-    });
+    observable
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          console.log(`${actionName} sent`);
+          this.errorMessage.set(null);
+        },
+        error: (error) => {
+          console.error(`${actionName} error:`, error);
+          this.errorMessage.set(error.message);
+        },
+      });
   }
 
   // ============================================================
@@ -178,18 +184,21 @@ export class HomeComponent {
     const velocity = pad.active ? 0x7f : 0x00;
     const midiNote = 0x48 + padIndex;
 
-    this.rtpMidiService.sendNoteOn(midiNote, velocity).subscribe({
-      next: () => {
-        console.log(`Pad ${pad.id} toggled - ${pad.active ? 'ON' : 'OFF'}`);
-        this.errorMessage.set(null);
-      },
-      error: (error) => {
-        console.error('Pad error:', error);
-        this.errorMessage.set(error.message);
-        pad.active = wasActive;
-        this.pads.set([...pads]);
-      },
-    });
+    this.rtpMidiService
+      .sendNoteOn(midiNote, velocity)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          console.log(`Pad ${pad.id} toggled - ${pad.active ? 'ON' : 'OFF'}`);
+          this.errorMessage.set(null);
+        },
+        error: (error) => {
+          console.error('Pad error:', error);
+          this.errorMessage.set(error.message);
+          pad.active = wasActive;
+          this.pads.set([...pads]);
+        },
+      });
   }
 
   // ============================================================
